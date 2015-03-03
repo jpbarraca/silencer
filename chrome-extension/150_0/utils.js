@@ -7,10 +7,10 @@ function decodeUtf8(e){var t="";var n=0;var r=0;var i=0;var s=0;var o=new Uint8A
 window.utils = { };
 
 utils.decrypt = function(data, key, salt) {
-	var KEY_ITERATIONS = 8;
+	var KEY_ITERATIONS = 25;
 	var KEY_LENGTH = 256;
 
-	return decodeUtf8(asmCrypto.AES_CBC.decrypt(base64ToArrayBuffer(data), asmCrypto.PBKDF2_HMAC_SHA1.bytes(key, salt, KEY_ITERATIONS, KEY_LENGTH/8)));
+	return decodeUtf8(asmCrypto.AES_GCM.decrypt(base64ToArrayBuffer(data), asmCrypto.PBKDF2_HMAC_SHA1.bytes(key, salt, KEY_ITERATIONS, KEY_LENGTH/8)));
 };
 
 utils.TAB = 9;
