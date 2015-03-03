@@ -24,10 +24,10 @@ import java.lang.reflect.Field;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -35,14 +35,16 @@ import javax.crypto.NoSuchPaddingException;
 
 @SuppressWarnings("deprecation")
 public class NotificationUtilities {
+    public static final String PREF_KEY = "KEY";
 
     public static boolean process(Context c, Notification n, String packageName, int id) {
-        // Get encryption params
-        String salt = Long.toHexString(new Random().nextLong());
-        String secret = PreferenceManager.getDefaultSharedPreferences(c).getString(Cryptography.PREF_KEY, "");
+        if (packageName.equals(c.getPackageName()))
+            return true;
 
-        if (secret.isEmpty()) return false;
-        if (packageName.equals(c.getPackageName())) return true;
+        String secret = PreferenceManager.getDefaultSharedPreferences(c).getString(PREF_KEY, "");
+
+        if (secret.isEmpty())
+            return false;
 
         // Magically extract text from notification
         ArrayList<String> notificationData = NotificationUtilities.getNotificationText(n);
@@ -73,14 +75,15 @@ public class NotificationUtilities {
             notificationBody += "\n" + notificationData.get(i);
         }
 
+
         // Create JSON object with all necessary information
-        JSONObject obj=new JSONObject();
+        JSONObject obj = new JSONObject();
         try {
-            obj.put("p",packageName);
-            obj.put("l",ai.loadLabel(pm).toString());
-            obj.put("t",notificationHeader);
-            obj.put("b",notificationBody);
-            obj.put("n",Integer.toString(id));
+            obj.put("p", packageName);
+            obj.put("l", ai.loadLabel(pm).toString());
+            obj.put("t", notificationHeader);
+            obj.put("b", notificationBody);
+            obj.put("n", Integer.toString(id));
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
@@ -89,9 +92,12 @@ public class NotificationUtilities {
         // Show notification momentarily so it is picked up by PushBullet
         Notification.Builder mBuilder = null;
         try {
+            EncryptedObject eo = new EncryptedObject(obj.toString().getBytes());
+            eo.encrypt(secret);
+
             mBuilder = new Notification.Builder(c)
-                    .setContentTitle(salt)
-                    .setContentText(encrypt(obj.toString(),secret, salt))
+                    .setContentTitle(eo.getMeta())
+                    .setContentText(eo.getDataString())
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setPriority(Notification.PRIORITY_LOW)
                     .setLargeIcon(n.largeIcon != null ? n.largeIcon : drawableToBitmap(pm.getApplicationIcon(ai)));
@@ -116,13 +122,15 @@ public class NotificationUtilities {
 
             ArrayList<String> notificationData = new ArrayList<String>();
 
-            if (extras.getString("android.title") != null) notificationData.add(extras.getString("android.title"));
-            if (extras.getString("android.text") != null) notificationData.add(extras.getString("android.text"));
-            if (extras.getString("android.subText") != null) notificationData.add(extras.getString("android.subText"));
+            if (extras.getString("android.title") != null)
+                notificationData.add(extras.getString("android.title"));
+            if (extras.getString("android.text") != null)
+                notificationData.add(extras.getString("android.text"));
+            if (extras.getString("android.subText") != null)
+                notificationData.add(extras.getString("android.subText"));
 
             return notificationData;
-        }
-        else {
+        } else {
             RemoteViews views = notification.contentView;
             Class<?> secretClass = views.getClass();
 
@@ -181,9 +189,5 @@ public class NotificationUtilities {
         drawable.draw(canvas);
 
         return bitmap;
-    }
-
-    public static String encrypt(String data, String secret, String salt) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidParameterSpecException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
-        return Cryptography.encrypt(data, secret, salt);
     }
 }

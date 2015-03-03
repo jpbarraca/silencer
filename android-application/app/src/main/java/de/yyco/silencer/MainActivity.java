@@ -10,10 +10,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+
+import java.security.SecureRandom;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -61,6 +64,16 @@ public class MainActivity extends ActionBarActivity {
         });
 
         EditText key = (EditText) findViewById(R.id.editText);
+
+        //If there is no key, lets generate one
+        if(settings.getString(NotificationUtilities.PREF_KEY,"").length() == 0){
+            SecureRandom random = new SecureRandom();
+            byte[] keyData = new byte[16];
+            random.nextBytes(keyData);
+
+            editor.putString(NotificationUtilities.PREF_KEY,Base64.encodeToString(keyData, Base64.NO_WRAP));
+        }
+
         key.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -70,7 +83,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                editor.putString(Cryptography.PREF_KEY, s.toString()).commit();
+                editor.putString(NotificationUtilities.PREF_KEY, s.toString()).commit();
             }
         });
     }
