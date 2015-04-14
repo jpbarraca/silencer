@@ -1,0 +1,56 @@
+{
+   "background": {
+      "scripts": [ "utils.js", "pb.js", "http.js", "analytics.js", "text.js", "events.js", "notifier.js", "notifier-chrome.js", "connection.js", "syncables.js", "device.js", "client-check.js", "clipboard.js", "phonebook.js", "pushes.js", "ephemerals.js", "pushing.js", "context-menu.js", "message-passing.js", "keyboard-shortcuts.js", "main.js" ]
+   },
+   "browser_action": {
+      "default_icon": {
+         "19": "icon_19.png",
+         "38": "icon_38.png"
+      },
+      "default_popup": "panel.html",
+      "default_title": "Pushbullet "
+   },
+   "commands": {
+      "dismiss-most-recent-notification": {
+         "description": "Dismiss the most recent notification",
+         "suggested_key": {
+            "default": "Ctrl+Shift+K",
+            "mac": "Command+Shift+K"
+         }
+      },
+      "instant-push-current-tab": {
+         "description": "Instantly push the current tab (configure in Options)",
+         "suggested_key": {
+            "default": "Ctrl+Shift+X",
+            "mac": "Command+Shift+X"
+         }
+      },
+      "pop-out-panel": {
+         "description": "Pop out the Push panel"
+      }
+   },
+   "content_scripts": [ {
+      "js": [ "content-script.js" ],
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_end"
+   } ],
+   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+   "description": "Pushbullet saves you time by moving your notifications, links, and files wherever you go.",
+   "homepage_url": "https://www.pushbullet.com",
+   "icons": {
+      "128": "icon_128.png",
+      "16": "icon_16.png",
+      "48": "icon_48.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKyWCIbMIUOs36oTwHVQjwECLV/PTT6Q9ZdSNv4ZpEa+HpUf9p+ymPICoIUru44Q4onwrBH+hllZi/p7SVhawEXW8YQDr4d7UINJIsHlvnDh9MdHGBRrZEDWGZVg84HEVqGdJ0n35G6BMrTYKOtZTj3uYa9FpUSrGLPW2sKSuTPQIDAQAB",
+   "manifest_version": 2,
+   "minimum_chrome_version": "26",
+   "name": "Pushbullet (Encryption Enhanced Version)",
+   "optional_permissions": [ "background", "clipboardRead", "clipboardWrite" ],
+   "options_page": "options.html",
+   "permissions": [ "tabs", "activeTab", "contextMenus", "cookies", "notifications", "idle", "https://*/*", "http://*/*" ],
+   "short_name": "Pushbullet",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "188",
+   "web_accessible_resources": [ "icon_19.png", "icon_48.png", "ic_action_cancel.png", "ic_action_halt.png", "ic_action_undo.png", "ic_action_sms.png", "ic_action_overflow.png", "ic_action_android.png", "ic_action_tick.png", "alert.ogg" ]
+}
