@@ -1,7 +1,7 @@
 silencer
 ========
 
-Experimental encrypted PushBullet (Android/Chrome Extension only)
+Experimental encrypted PushBullet (Android/Chrome Extension only) using AES-GCM and WebCrypto.
 
 # Setup
 ## Chrome Extension
