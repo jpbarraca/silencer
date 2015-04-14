@@ -13,38 +13,25 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
 import java.util.ArrayList;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 @SuppressWarnings("deprecation")
 public class NotificationUtilities {
-    public static final String PREF_KEY = "KEY";
-
     public static boolean process(Context c, Notification n, String packageName, int id) {
+
         if (packageName.equals(c.getPackageName()))
             return true;
 
-        String secret = PreferenceManager.getDefaultSharedPreferences(c).getString(PREF_KEY, "");
+        SecureStorage ss = SecureStorage.getInstance(c);
 
-        if (secret.isEmpty())
-            return false;
+        String secret = ss.get(MainActivity.KEYNAME,"");
 
         // Magically extract text from notification
         ArrayList<String> notificationData = NotificationUtilities.getNotificationText(n);
@@ -92,12 +79,21 @@ public class NotificationUtilities {
         // Show notification momentarily so it is picked up by PushBullet
         Notification.Builder mBuilder = null;
         try {
-            EncryptedObject eo = new EncryptedObject(obj.toString().getBytes());
-            eo.encrypt(secret);
+            EncryptedObject eo;
+            String body = obj.toString();
+            String meta = "PLAIN";
+
+            if (secret != null &&  !secret.isEmpty()) {
+
+                eo = new EncryptedObject(body.getBytes());
+                eo.encrypt(secret);
+                body = eo.getDataString();
+                meta = eo.getMeta();
+            }
 
             mBuilder = new Notification.Builder(c)
-                    .setContentTitle(eo.getMeta())
-                    .setContentText(eo.getDataString())
+                    .setContentTitle(meta)
+                    .setContentText(body)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setPriority(Notification.PRIORITY_LOW)
                     .setLargeIcon(n.largeIcon != null ? n.largeIcon : drawableToBitmap(pm.getApplicationIcon(ai)));

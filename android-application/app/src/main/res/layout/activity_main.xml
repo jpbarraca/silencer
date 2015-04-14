@@ -64,6 +64,33 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Randomize"
+                android:id="@+id/buttonRandomizeKey"/>
+
+        <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show"
+                android:id="@+id/buttonShowHideKey"
+                />
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Test"
+                android:id="@+id/buttonTestMessage"/>
+    </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -78,13 +105,5 @@
         android:layout_height="wrap_content"
         android:text="View Instructions"
         android:id="@+id/buttonViewInstructions" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Note: This is experimental software and should be used with caution. Additional features such as selecting notifications have not yet been implemented but are planned."
-        android:id="@+id/textView7"
-        android:paddingTop="16dp"
-        android:textStyle="italic" />
 
 </LinearLayout>
