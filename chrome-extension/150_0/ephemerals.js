@@ -60,9 +60,6 @@ var showMirror = function(push) {
 var packageNameToConversations = { };
 
 var mirrorNotification = function(push) {
-    pb.log('Mirroring notification for:');
-    pb.log(push);
-
     if (!push.iden) {
         push.iden = '' + Date.now();
     }
@@ -99,22 +96,14 @@ var mirrorNotification = function(push) {
 
     if (push.package_name == 'com.pushbullet.android') {
         options.title = '';
-	} else if (push.package_name == 'de.yyco.silencer' && localStorage.enableEncrpyption) {	
+	} else if (push.package_name == 'de.yyco.silencer' && localStorage.enableEncrpyption) {
 		try {
-			console.log("Encrypted: " + push.body);
 
-			var decrypted = utils.decrypt(push.body, localStorage.encKey, push.title);
-			var decryptedData = JSON.parse(decrypted);
-		
-			push.package_name = decryptedData.p;
-			push.application_name = decryptedData.l;
-			push.title = decryptedData.t;
-			push.body = decryptedData.b;
-			push.notification_id = decryptedData.n;
-			
-			options.title = push.application_name + ': ';
+			utils.decrypt(push,localStorage.encKey, mirrorNotification);
+            return;
 		}
 		catch (e) {
+            console.log(e);
 			options.title = "Silencer: ";
 			push.title = "Decryption error";
 			push.body = "Ensure encryption key is correct";
