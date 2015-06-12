@@ -29,12 +29,18 @@ public class NotificationUtilities {
         if (packageName.equals(c.getPackageName()))
             return true;
 
+
+        ArrayList<String> notificationData = null;
+        // Magically extract text from notification
+        try {
+            notificationData = NotificationUtilities.getNotificationText(n);
+        }catch(Exception e){
+            return false;
+        }
+
         SecureStorage ss = SecureStorage.getInstance(c);
 
         String secret = ss.get(MainActivity.KEYNAME,"");
-
-        // Magically extract text from notification
-        ArrayList<String> notificationData = NotificationUtilities.getNotificationText(n);
 
         // Use PackageManager to get application name and icon
         final PackageManager pm = c.getPackageManager();
@@ -85,7 +91,7 @@ public class NotificationUtilities {
 
             if (secret != null &&  !secret.isEmpty()) {
 
-                eo = new EncryptedObject(body.getBytes());
+                eo = new EncryptedObject(body.getBytes("UTF-8"));
                 eo.encrypt(secret);
                 body = eo.getDataString();
                 meta = eo.getMeta();
@@ -120,8 +126,8 @@ public class NotificationUtilities {
 
             if (extras.getString("android.title") != null)
                 notificationData.add(extras.getString("android.title"));
-            if (extras.getString("android.text") != null)
-                notificationData.add(extras.getString("android.text"));
+            if (extras.getCharSequence("android.text") != null)
+                notificationData.add(extras.getCharSequence("android.text").toString());
             if (extras.getString("android.subText") != null)
                 notificationData.add(extras.getString("android.subText"));
 
